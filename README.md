@@ -1,1 +1,0 @@
-# CPL Story Collector
