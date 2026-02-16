@@ -3,7 +3,7 @@ import { pgTable, text, varchar, serial, timestamp, jsonb, boolean, integer } fr
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
+export const users = pgTable("cpl_users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
@@ -18,7 +18,7 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // Students table - stores basic student info
-export const students = pgTable("students", {
+export const students = pgTable("cpl_students", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email"),
@@ -30,7 +30,7 @@ export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type Student = typeof students.$inferSelect;
 
 // Stories table - stores the generated stories
-export const stories = pgTable("stories", {
+export const stories = pgTable("cpl_stories", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").references(() => students.id),
   content: text("content").notNull(),
@@ -50,7 +50,7 @@ export type InsertStory = z.infer<typeof insertStorySchema>;
 export type Story = typeof stories.$inferSelect;
 
 // Conversations table - stores the full interview conversation
-export const conversations = pgTable("conversations", {
+export const conversations = pgTable("cpl_conversations", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").references(() => students.id),
   messages: jsonb("messages").notNull().$type<Array<{

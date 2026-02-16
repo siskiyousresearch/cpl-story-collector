@@ -7,29 +7,31 @@ An AI-powered platform that collects Credit for Prior Learning (CPL) success sto
 - **AI-Guided Interviews** — Conversational AI interviewer that walks students through their CPL journey with thoughtful, context-aware questions
 - **Automatic Story Generation** — AI drafts a ~150-word success story from the interview transcript
 - **Story Review & Editing** — Students can review, edit, and approve their generated story before publishing
-- **Photo Upload** — Students can attach a photo to accompany their story
+- **Photo Upload** — Students can attach a photo to accompany their story (stored in Supabase Storage)
 - **Multi-Step Flow** — Welcome → Interview → Review → Success, with smooth transitions and progress tracking
 
 ## Tech Stack
 
 - **Frontend:** React 19, Vite, Tailwind CSS, shadcn/ui (Radix), Framer Motion, Wouter
-- **Backend:** Node.js, Express, TypeScript
-- **Database:** PostgreSQL with Drizzle ORM
+- **API:** Vercel Serverless Functions (TypeScript)
+- **Database:** PostgreSQL (Supabase) with Drizzle ORM
+- **File Storage:** Supabase Storage for photo uploads
 - **AI:** OpenAI API (GPT-4o for interviews and story generation)
-- **File Uploads:** Multer for student photo uploads
 
 ## Prerequisites
 
 - Node.js 20+
-- PostgreSQL database
+- Supabase project (database + storage)
 - OpenAI API key
+- Vercel account (for deployment)
 
 ## Environment Variables
 
 ```env
 DATABASE_URL=postgresql://user:password@host:5432/dbname
 OPENAI_API_KEY=your-openai-api-key
-PORT=5000
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
 ## Getting Started
@@ -38,51 +40,51 @@ PORT=5000
 # Install dependencies
 npm install
 
-# Push database schema
+# Push database schema to Supabase
 npm run db:push
 
-# Start development server
+# Start local dev server (uses Vercel CLI)
 npm run dev
 ```
 
-The app will be available at `http://localhost:5000`.
+## Deployment
 
-## Build & Production
+This project is configured for Vercel:
 
-```bash
-# Build for production
-npm run build
+1. Connect your GitHub repo to Vercel
+2. Set environment variables in the Vercel dashboard
+3. Deploy — Vercel will build the frontend and deploy the API routes automatically
 
-# Start production server
-npm start
-```
+### Supabase Setup
+
+1. Create a Supabase project
+2. Copy the database connection string (use the connection pooler URL)
+3. Create a storage bucket named `cpl-photos` with public access
+4. Copy the project URL and service role key for env vars
 
 ## Project Structure
 
 ```
-client/                 # React frontend
+client/                 # React frontend (Vite SPA)
   src/
     components/         # UI components (shadcn/ui)
     pages/              # Route pages (welcome, interview, review, success)
     lib/                # Utilities, query client, story context
     hooks/              # Custom React hooks
-server/                 # Express backend
-  ai.ts                 # OpenAI integration (interview + story generation)
-  routes.ts             # API routes (conversations, stories, photo upload)
-  storage.ts            # Database access layer
-  index.ts              # Server entry point
-  static.ts             # Static file serving
+api/                    # Vercel serverless API routes
+  _lib/                 # Shared server utilities (db, storage, ai)
+  conversations/        # Conversation endpoints (start, message)
+  stories/              # Story endpoints (generate, update, publish, photo)
 shared/
   schema.ts             # Drizzle database schema and types
-public/                 # Static assets
 ```
 
 ## Database Schema
 
-- **students** — Student name and email
-- **conversations** — Interview message history (stored as JSON), linked to student and generated story
-- **stories** — AI-generated story content, photo URL, approval status
-- **users** — Admin authentication
+- **cpl_students** — Student name and email
+- **cpl_conversations** — Interview message history (stored as JSON), linked to student and generated story
+- **cpl_stories** — AI-generated story content, photo URL, approval status
+- **cpl_users** — Admin authentication
 
 ## How It Works
 
